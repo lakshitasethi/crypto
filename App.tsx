@@ -1,11 +1,44 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, Image, StyleSheet, ScrollView, TouchableOpacity, Platform, ImageBackground, SafeAreaView, Dimensions, StatusBar } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import { ProgressBar } from 'react-native-paper';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 const { width, height } = Dimensions.get('window');
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const App = () => {
+
+  const [increase,setIncrese]=useState(0.00000000)
+
+  useEffect(() => {
+    const loadValue = async () => {
+      try {
+        const value = await AsyncStorage.getItem('increase');
+        if (value !== null) {
+          setIncrese(parseFloat(value));
+        }
+      } catch (e) {
+        console.error('Failed to load value from AsyncStorage', e);
+      }
+    };
+
+    loadValue();
+  }, []);
+
+  const handleIncrement = async () => {
+    try {
+      const newIncrease = (increase + 0.1).toFixed(8);
+      setIncrese(parseFloat(newIncrease));
+      await AsyncStorage.setItem('increase', newIncrease);
+    } catch (e) {
+      console.error('Failed to save value to AsyncStorage', e);
+    }
+  };
+
+
+
+
+
   return (
     <View style={{ flex: 1 }}>
 
@@ -27,16 +60,18 @@ const App = () => {
                 <View style={styles.profileInfo}>
                   <Image
                     source={require('./src/assets/images/walletImg.png')} />
-                  <Text style={styles.profileSubText}> 0.0000051 BTC</Text>
+                  <Text style={styles.profileSubText}>  BTC</Text>
                 </View>
               </View>
               <View style={styles.balanceSection}>
                 <Image
                   style={styles.coinimage}
                   source={require('./src/assets/images/coinImg.png')} />
-                <Text style={styles.balanceText}>0.00004478</Text>
+                <Text style={styles.balanceText}>{increase.toFixed(8)}</Text>
               </View>
-              <TouchableOpacity activeOpacity={0.8}>
+              <TouchableOpacity activeOpacity={0.8}
+              // onPress={handleIncrement}
+              >
                 <View style={styles.bitCoinBorder}>
                   <Image
                     resizeMode='contain'
